@@ -1,10 +1,27 @@
 import 'package:flutter/material.dart';
+
+import 'backdrop.dart';
+import 'category_menu.dart';
 import 'colors.dart';
 import 'home.dart';
 import 'login.dart';
+import 'models/product.dart';
 
-class ShrineApp extends StatelessWidget {
+class ShrineApp extends StatefulWidget {
   const ShrineApp({super.key});
+
+  @override
+  State<ShrineApp> createState() => _ShrineAppState();
+}
+
+class _ShrineAppState extends State<ShrineApp> {
+  Category _currentCategory = Category.all;
+
+  void _onCategoryTap(Category category) {
+    setState(() {
+      _currentCategory = category;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -13,14 +30,22 @@ class ShrineApp extends StatelessWidget {
       initialRoute: '/login',
       routes: {
         '/login': (BuildContext context) => const LoginPage(),
-        '/': (BuildContext context) => const HomePage(),
+        '/': (BuildContext context) => Backdrop(
+              currentCategory: _currentCategory,
+              frontLayer: HomePage(category: _currentCategory),
+              backLayer: CategoryMenuPage(
+                currentCategory: _currentCategory,
+                onCategoryTap: _onCategoryTap,
+              ),
+              frontTitle: const Text('SHRINE'),
+              backTitle: const Text('MENU'),
+            ),
       },
-      theme: _kShrineTheme, // Aplicamos el tema aquí
+      theme: _kShrineTheme,
     );
   }
 }
 
-// Configuración del Tema
 final ThemeData _kShrineTheme = _buildShrineTheme();
 
 ThemeData _buildShrineTheme() {
@@ -32,18 +57,26 @@ ThemeData _buildShrineTheme() {
       secondary: kShrineBrown900,
       error: kShrineErrorRed,
     ),
-    // Configuración de los campos de texto (TextFields)
+    textTheme: _buildShrineTextTheme(base.textTheme),
     inputDecorationTheme: const InputDecorationTheme(
       border: OutlineInputBorder(),
       focusedBorder: OutlineInputBorder(
-        borderSide: BorderSide(
-          width: 2.0,
-          color: kShrineBrown900,
-        ),
+        borderSide: BorderSide(width: 2.0, color: kShrineBrown900),
       ),
-      floatingLabelStyle: TextStyle(
-        color: kShrineBrown900,
-      ),
+      floatingLabelStyle: TextStyle(color: kShrineBrown900),
     ),
+  );
+}
+
+TextTheme _buildShrineTextTheme(TextTheme base) {
+  return base.copyWith(
+    headlineSmall: base.headlineSmall!.copyWith(fontWeight: FontWeight.w500),
+    titleLarge: base.titleLarge!.copyWith(fontSize: 18.0),
+    bodySmall: base.bodySmall!.copyWith(fontWeight: FontWeight.w400, fontSize: 14.0),
+    bodyLarge: base.bodyLarge!.copyWith(fontWeight: FontWeight.w500, fontSize: 16.0),
+  ).apply(
+    fontFamily: 'Rubik',
+    displayColor: kShrineBrown900,
+    bodyColor: kShrineBrown900,
   );
 }
