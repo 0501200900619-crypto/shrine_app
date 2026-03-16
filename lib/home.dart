@@ -5,11 +5,15 @@ import 'models/product.dart';
 import 'models/products_repository.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+  // 1. Agrega esta variable para recibir la categoría
+  final Category category;
 
-  // Método para crear las tarjetas de los productos
+  // 2. Actualiza el constructor para que pida la categoría
+  const HomePage({this.category = Category.all, super.key});
+
   List<Card> _buildGridCards(BuildContext context) {
-    List<Product> products = ProductsRepository.loadProducts(Category.all);
+    // 3. Usa la categoría recibida para filtrar los productos
+    List<Product> products = ProductsRepository.loadProducts(category);
 
     if (products.isEmpty) {
       return const <Card>[];
@@ -62,25 +66,15 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // El resto del build se mantiene igual...
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('SHRINE'),
-        leading: IconButton(
-          icon: const Icon(Icons.menu),
-          onPressed: () => print('Menu button'),
-        ),
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () => print('Search button'),
-          ),
-        ],
-      ),
-      // El GridView.count crea la cuadrícula
+      // Quita el AppBar de aquí si el Backdrop ya tiene uno, 
+      // o déjalo si prefieres que el Home tenga el suyo propio.
+      // En el Codelab 104, el AppBar suele ir en el Backdrop.
       body: GridView.count(
-        crossAxisCount: 2, // Dos columnas
+        crossAxisCount: 2,
         padding: const EdgeInsets.all(16.0),
-        childAspectRatio: 8.0 / 9.0, // Proporción de las tarjetas
+        childAspectRatio: 8.0 / 9.0,
         children: _buildGridCards(context),
       ),
     );
